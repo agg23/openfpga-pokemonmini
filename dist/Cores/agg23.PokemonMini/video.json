@@ -1,0 +1,15 @@
+{
+  "video": {
+    "magic": "APF_VER_1",
+    "scaler_modes": [
+      {
+        "width": 96,
+        "height": 64,
+        "aspect_w": 3,
+        "aspect_h": 2,
+        "rotation": 0,
+        "mirror": 0
+      }
+    ]
+  }
+}

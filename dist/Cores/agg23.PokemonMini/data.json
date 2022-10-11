@@ -1,0 +1,24 @@
+{
+  "data": {
+    "magic": "APF_VER_1",
+    "data_slots": [
+      {
+        "name": "Cartridge",
+        "id": 0,
+        "required": true,
+        "parameters": "0x109",
+        "extensions": ["min"],
+        "address": "0x10000000"
+      },
+      {
+        "name": "Save State",
+        "id": 11,
+        "required": false,
+        "parameters": "0x84",
+        "nonvolatile": true,
+        "extensions": ["sss"],
+        "address": "0x20000000"
+      }
+    ]
+  }
+}
