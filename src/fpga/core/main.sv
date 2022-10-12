@@ -6,6 +6,17 @@ module pokemonmini (
     input wire reset_n,
     input wire pll_core_locked,
 
+    // Input
+    input wire button_a,
+    input wire button_b,
+    input wire button_select,
+    input wire trigger_l,
+    input wire trigger_r,
+    input wire dpad_up,
+    input wire dpad_down,
+    input wire dpad_left,
+    input wire dpad_right,
+
     // Data in
     input wire        ioctl_wr,
     input wire [24:0] ioctl_addr,
@@ -428,7 +439,17 @@ module pokemonmini (
   //   joystick_0[5],  //      (B) B
   //   joystick_0[4]  //      (A) A
   // };
-  wire [8:0] keys_active = 0;
+  wire [8:0] keys_active = {
+    trigger_l,
+    button_select,
+    dpad_right,
+    dpad_left,
+    dpad_down,
+    dpad_up,
+    trigger_r,
+    button_b,
+    button_a
+  };
 
   wire [5:0] lcd_contrast;
   wire [7:0] minx_data_in;

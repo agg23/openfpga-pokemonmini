@@ -504,6 +504,16 @@ module core_top (
   //     .read_data(sd_buff_din)
   // );
 
+  wire [15:0] cont1_key_s;
+
+  synch_3 #(
+      .WIDTH(16)
+  ) cont1_s (
+      cont1_key,
+      cont1_key_s,
+      clk_sys_32
+  );
+
   wire [15:0] audio;
 
   pokemonmini pokemonmini (
@@ -514,6 +524,18 @@ module core_top (
       .reset_n(reset_n),
       .pll_core_locked(pll_core_locked),
 
+      // Input
+      .button_a(cont1_key_s[4]),
+      .button_b(cont1_key_s[5]),
+      .button_select(cont1_key_s[14]),
+      .trigger_l(cont1_key_s[8]),
+      .trigger_r(cont1_key_s[9]),
+      .dpad_up(cont1_key_s[0]),
+      .dpad_down(cont1_key_s[1]),
+      .dpad_left(cont1_key_s[2]),
+      .dpad_right(cont1_key_s[3]),
+
+      // Data in
       .ioctl_wr(ioctl_wr),
       .ioctl_addr(ioctl_addr),
       .ioctl_dout(ioctl_dout),
@@ -556,8 +578,8 @@ module core_top (
   reg video_vs_reg;
   reg [23:0] video_rgb_reg;
 
-  assign video_rgb_clock = clk_rt_4_195;
-  assign video_rgb_clock_90 = clk_vid_4_195_90deg;
+  assign video_rgb_clock = clk_vid_2_5;
+  assign video_rgb_clock_90 = clk_vid_2_5_90deg;
   assign video_rgb = video_rgb_reg;
   assign video_de = video_de_reg;
   assign video_skip = 0;
@@ -570,7 +592,7 @@ module core_top (
   reg hs_prev;
   reg vs_prev;
 
-  always @(posedge clk_rt_4_195) begin
+  always @(posedge clk_vid_2_5) begin
     video_hs_reg  <= 0;
     video_de_reg  <= 0;
     video_rgb_reg <= 24'h0;
@@ -590,7 +612,7 @@ module core_top (
     end
 
     if (~hs_prev && video_hs_core) begin
-      // HSync went high. Delay by 3 cycles to prevent overlapping with VSync
+      // HSync went high. Delay by 6 cycles to prevent overlapping with VSync
       hs_delay <= 7;
     end
 
@@ -624,7 +646,8 @@ module core_top (
   wire clk_mem_40;
   wire clk_sys_32;
   wire clk_rt_4_195;
-  wire clk_vid_4_195_90deg;
+  wire clk_vid_2_5;
+  wire clk_vid_2_5_90deg;
 
   wire pll_core_locked;
 
@@ -635,7 +658,8 @@ module core_top (
       .outclk_0(clk_mem_40),
       .outclk_1(clk_sys_32),
       .outclk_2(clk_rt_4_195),
-      .outclk_3(clk_vid_4_195_90deg),
+      .outclk_3(clk_vid_2_5),
+      .outclk_4(clk_vid_2_5_90deg),
 
       .locked(pll_core_locked)
   );
