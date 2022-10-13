@@ -17,6 +17,9 @@ module pokemonmini (
     input wire dpad_left,
     input wire dpad_right,
 
+    // Settings
+    input wire blending_enabled,
+
     // Data in
     input wire        ioctl_wr,
     input wire [24:0] ioctl_addr,
@@ -189,7 +192,7 @@ module pokemonmini (
   assign video_g = pixel_value_green;
   assign video_b = pixel_value_blue;
 
-  wire blend_mode = status[98];
+  wire blend_mode = blending_enabled;
 
   localparam bit [7:0] OFF_COLOR[0:2] = '{8'hB7, 8'hCA, 8'hB7};
   localparam bit [7:0] ON_COLOR[0:2] = '{8'h04, 8'h16, 8'h04};

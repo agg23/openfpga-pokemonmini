@@ -328,6 +328,16 @@ module core_top (
     endcase
   end
 
+  always @(posedge clk_74a) begin
+    if (bridge_wr) begin
+      case (bridge_addr)
+        32'h100: begin
+          blending_enabled <= bridge_wr_data[0];
+        end
+      endcase
+    end
+  end
+
 
   //
   // host/target command handler
@@ -514,6 +524,19 @@ module core_top (
       clk_sys_32
   );
 
+  // Settings
+  reg blending_enabled;
+
+  synch_3 #(
+      .WIDTH(1)
+  ) settings_s (
+      blending_enabled,
+      blending_enabled_s,
+      clk_sys_32
+  );
+
+  wire blending_enabled_s;
+
   wire [15:0] audio;
 
   pokemonmini pokemonmini (
@@ -534,6 +557,9 @@ module core_top (
       .dpad_down(cont1_key_s[1]),
       .dpad_left(cont1_key_s[2]),
       .dpad_right(cont1_key_s[3]),
+
+      // Settings
+      .blending_enabled(blending_enabled_s),
 
       // Data in
       .ioctl_wr(ioctl_wr),
