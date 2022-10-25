@@ -47,10 +47,12 @@ module pokemonmini (
     output wire [7:0] video_b,
 
     // Audio
-    output wire [15:0] audio
+    output wire [15:0] audio,
+
+    // RTC
+    input  wire [63:0] rtc_timestamp
 );
   wire [127:0] status = 0;
-  wire [ 64:0] rtc_timestamp = 0;
 
   reg  [ 31:0]                    sd_lba;
   reg                             sd_rd = 0;
@@ -557,9 +559,9 @@ module pokemonmini (
     bcd2bin = {4'd0, bcd[7:4]} * 8'd10 + {4'd0, bcd[3:0]};
   endfunction
 
-  wire [7:0] rtc_year = bcd2bin(rtc_timestamp[47:40]);
-  wire [7:0] rtc_month = bcd2bin(rtc_timestamp[39:32]);
-  wire [7:0] rtc_day = bcd2bin(rtc_timestamp[31:24]);
+  wire [7:0] rtc_year = bcd2bin(rtc_timestamp[55:48]);
+  wire [7:0] rtc_month = bcd2bin(rtc_timestamp[47:40]);
+  wire [7:0] rtc_day = bcd2bin(rtc_timestamp[39:32]);
   wire [7:0] rtc_hour = bcd2bin(rtc_timestamp[23:16]);
   wire [7:0] rtc_min = bcd2bin(rtc_timestamp[15:8]);
   wire [7:0] rtc_sec = bcd2bin(rtc_timestamp[7:0]);
