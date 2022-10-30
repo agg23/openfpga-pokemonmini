@@ -381,6 +381,9 @@ module core_top (
   wire savestate_load_err;
 
   wire osnotify_inmenu;
+  wire [31:0] rtc_seconds;
+  wire [31:0] rtc_date;
+  wire [31:0] rtc_time;
 
   // bridge target commands
   // synchronous to clk_74a
@@ -420,6 +423,10 @@ module core_top (
       .dataslot_requestwrite_ok (dataslot_requestwrite_ok),
 
       .dataslot_allcomplete(dataslot_allcomplete),
+
+      .rtc_seconds(rtc_seconds),
+      .rtc_date   (rtc_date),
+      .rtc_time   (rtc_time),
 
       .savestate_supported  (savestate_supported),
       .savestate_addr       (savestate_addr),
@@ -586,7 +593,8 @@ module core_top (
       .video_g(vid_rgb_core[15:8]),
       .video_b(vid_rgb_core[7:0]),
 
-      .audio(audio)
+      .audio(audio),
+      .rtc_timestamp({rtc_date, rtc_time})
   );
 
 
