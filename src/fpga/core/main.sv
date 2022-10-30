@@ -26,6 +26,14 @@ module pokemonmini (
     input wire [ 7:0] ioctl_dout,
     input wire        ioctl_download,
 
+    // Saves
+    input wire save_download,
+    input wire sd_rd,
+    input wire sd_wr,
+    input wire [12:0] sd_buff_addr,
+    output wire [7:0] sd_buff_din,
+    input wire [7:0] sd_buff_dout,
+
     // SDRAM
     output wire [12:0] dram_a,
     output wire [ 1:0] dram_ba,
@@ -50,25 +58,19 @@ module pokemonmini (
     output wire [15:0] audio,
 
     // RTC
-    input  wire [63:0] rtc_timestamp
+    input wire [63:0] rtc_timestamp
 );
   wire [127:0] status = 0;
 
-  reg  [ 31:0]                    sd_lba;
-  reg                             sd_rd = 0;
-  reg                             sd_wr = 0;
-  wire                            sd_ack;
-  wire [ 13:0]                    sd_buff_addr;
-  wire [  7:0]                    sd_buff_dout;
-  wire [  7:0]                    sd_buff_din;
-  wire                            sd_buff_wr;
-  wire                            img_mounted;
-  wire                            img_readonly;
-  wire [ 63:0]                    img_size;
+  reg  [ 31:0]             sd_lba;
+  wire                     sd_ack;
+  wire                     img_mounted;
+  wire                     img_readonly;
+  wire [ 63:0]             img_size;
 
   ///////////////////////   CLOCKS   ///////////////////////////////
 
-  reg  [  6:0]                    clk_rt_prescale = 0;
+  reg  [  6:0]             clk_rt_prescale = 0;
   always_ff @(posedge clk_rt_4_195) clk_rt_prescale <= clk_rt_prescale + 1;
 
   reg [3:0] clk_prescale = 0;
@@ -82,7 +84,7 @@ module pokemonmini (
   //reg sdram_read = 0;
   //always_ff @ (posedge clk_sys) sdram_read <= ~sdram_read;
 
-  wire reset = ~reset_n | cart_download | bios_download | bk_loading;
+  wire reset = ~reset_n | cart_download | bios_download | save_download;
   reg [3:0] reset_counter;
   always_ff @(posedge clk_sys_32) begin
     if (reset) reset_counter <= 4'hF;
@@ -654,8 +656,8 @@ module pokemonmini (
 
   // @note: Since bk_loading is taken into account in the reset signal, this
   // means that rtc setting will always come after the eeprom is already loaded.
-  wire [12:0] bk_addr = {sd_lba[3:0], sd_buff_addr[8:0]};
-  wire bk_wr = sd_buff_wr & sd_ack;
+  wire [12:0] bk_addr = sd_buff_addr[12:0];
+  wire bk_wr = sd_wr;
   wire [7:0] bk_data = sd_buff_dout;
   wire [7:0] bk_q;
 
@@ -695,10 +697,10 @@ module pokemonmini (
 
 
   reg old_load = 0, old_save = 0, old_ack;
-  wire load_posedge = ~old_load & bk_load;
-  wire save_posedge = ~old_save & bk_save;
-  wire ack_posedge = ~old_ack & sd_ack;
-  wire ack_negedge = old_ack & ~sd_ack;
+  // wire load_posedge = ~old_load & bk_load;
+  // wire save_posedge = ~old_save & bk_save;
+  // wire ack_posedge = ~old_ack & sd_ack;
+  // wire ack_negedge = old_ack & ~sd_ack;
   // always @(posedge clk_sys_32) begin
   //   old_load <= bk_load;
   //   old_save <= bk_save;

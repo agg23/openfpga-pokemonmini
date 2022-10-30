@@ -314,9 +314,9 @@ module core_top (
       default: begin
         bridge_rd_data <= 0;
       end
-      // 32'h2xxxxxxx: begin
-      //   bridge_rd_data <= sd_read_data;
-      // end
+      32'h2xxxxxxx: begin
+        bridge_rd_data <= sd_read_data;
+      end
       32'h10xxxxxx: begin
         // example
         // bridge_rd_data <= example_device_data;
@@ -454,13 +454,19 @@ module core_top (
   );
 
   reg ioctl_download = 0;
+  reg save_download = 0;
   wire ioctl_wr;
   wire [24:0] ioctl_addr;
   wire [7:0] ioctl_dout;
 
   always @(posedge clk_74a) begin
-    if (dataslot_requestwrite) ioctl_download <= 1;
-    else if (dataslot_allcomplete) ioctl_download <= 0;
+    if (dataslot_requestwrite) begin
+      if (dataslot_requestwrite_id == 1) save_download <= 1;
+      else ioctl_download <= 1;
+    end else if (dataslot_allcomplete) begin
+      ioctl_download <= 0;
+      save_download  <= 0;
+    end
   end
 
   always @(posedge clk_74a or negedge pll_core_locked) begin
@@ -471,7 +477,7 @@ module core_top (
     end else begin
       // Write sram size
       datatable_wren <= 1;
-      datatable_data <= 32'h100000;
+      datatable_data <= 32'h2000;
       // Data slot index 1, not id 1
       datatable_addr <= 1 * 2 + 1;
     end
@@ -498,28 +504,54 @@ module core_top (
       .write_data(ioctl_dout)
   );
 
-  // wire sd_rd;
-  // wire [24:0] sd_buff_addr_out;
-  // wire [7:0] sd_buff_din;
-  // wire [31:0] sd_read_data;
+  wire sd_wr;
+  wire [12:0] sd_buff_addr_in;
+  wire [7:0] sd_buff_dout;
 
-  // data_unloader #(
-  //     .ADDRESS_MASK_UPPER_4(4'h2),
-  //     .ADDRESS_SIZE(25),
-  //     .READ_MEM_CLOCK_DELAY(10)
-  // ) data_unloader (
-  //     .clk_74a(clk_74a),
-  //     .clk_memory(clk_mem_40),
+  data_loader #(
+      .ADDRESS_MASK_UPPER_4(4'h2),
+      .ADDRESS_SIZE(13),
 
-  //     .bridge_rd(bridge_rd),
-  //     .bridge_endian_little(bridge_endian_little),
-  //     .bridge_addr(bridge_addr),
-  //     .bridge_rd_data(sd_read_data),
+      .WRITE_MEM_CLOCK_DELAY(12),
+      .WRITE_MEM_EN_CYCLE_LENGTH(5)
+  ) save_data_loader (
+      .clk_74a(clk_74a),
+      .clk_memory(clk_mem_40),
 
-  //     .read_en  (sd_rd),
-  //     .read_addr(sd_buff_addr_out),
-  //     .read_data(sd_buff_din)
-  // );
+      .bridge_wr(bridge_wr),
+      .bridge_endian_little(bridge_endian_little),
+      .bridge_addr(bridge_addr),
+      .bridge_wr_data(bridge_wr_data),
+
+      .write_en  (sd_wr),
+      .write_addr(sd_buff_addr_in),
+      .write_data(sd_buff_dout)
+  );
+
+  wire sd_rd;
+  wire [12:0] sd_buff_addr_out;
+  wire [7:0] sd_buff_din;
+  wire [31:0] sd_read_data;
+
+  data_unloader #(
+      .ADDRESS_MASK_UPPER_4(4'h2),
+      .ADDRESS_SIZE(13),
+      .READ_MEM_CLOCK_DELAY(12)
+  ) save_data_unloader (
+      .clk_74a(clk_74a),
+      .clk_memory(clk_mem_40),
+
+      .bridge_rd(bridge_rd),
+      .bridge_endian_little(bridge_endian_little),
+      .bridge_addr(bridge_addr),
+      .bridge_rd_data(sd_read_data),
+
+      .read_en  (sd_rd),
+      .read_addr(sd_buff_addr_out),
+      .read_data(sd_buff_din)
+  );
+
+  wire [12:0] sd_buff_addr = sd_wr ? sd_buff_addr_in : sd_buff_addr_out;
 
   wire [15:0] cont1_key_s;
 
@@ -535,14 +567,16 @@ module core_top (
   reg blending_enabled;
 
   synch_3 #(
-      .WIDTH(1)
+      .WIDTH(3)
   ) settings_s (
-      blending_enabled,
-      blending_enabled_s,
+      {blending_enabled, save_download, ioctl_download},
+      {blending_enabled_s, save_download_s, ioctl_download_s},
       clk_sys_32
   );
 
   wire blending_enabled_s;
+  wire save_download_s;
+  wire ioctl_download_s;
 
   wire [15:0] audio;
 
@@ -572,7 +606,15 @@ module core_top (
       .ioctl_wr(ioctl_wr),
       .ioctl_addr(ioctl_addr),
       .ioctl_dout(ioctl_dout),
-      .ioctl_download(ioctl_download),
+      .ioctl_download(ioctl_download_s),
+
+      // Save input/output
+      .save_download(save_download_s),
+      .sd_rd(sd_rd),
+      .sd_wr(sd_wr),
+      .sd_buff_addr(sd_buff_addr),
+      .sd_buff_din(sd_buff_din),
+      .sd_buff_dout(sd_buff_dout),
 
       // SDRAM
       .dram_a(dram_a),
