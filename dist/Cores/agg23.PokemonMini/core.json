@@ -4,11 +4,11 @@
     "metadata": {
       "platform_ids": ["poke_mini"],
       "shortname": "PokemonMini",
-      "description": "APF core template. Displays gray test screen.",
+      "description": "A small handheld Tamagotchi-like console by Nintendo",
       "author": "agg23",
       "url": "https://github.com/agg23/openfpga-pokemonmini",
       "version": "0.1.0",
-      "date_release": "2022-10-11"
+      "date_release": "2022-11-03"
     },
     "framework": {
       "target_product": "Analogue Pocket",
