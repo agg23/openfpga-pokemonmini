@@ -1,6 +1,37 @@
 {
-    "input": {
-        "magic": "APF_VER_1",
-        "controllers": []
-    }
+  "input": {
+    "magic": "APF_VER_1",
+    "controllers": [
+      {
+        "type": "default",
+        "mappings": [
+          {
+            "id": 0,
+            "name": "A Button",
+            "key": "pad_btn_a"
+          },
+          {
+            "id": 1,
+            "name": "B Button",
+            "key": "pad_btn_b"
+          },
+          {
+            "id": 10,
+            "name": "Shock",
+            "key": "pad_trig_l"
+          },
+          {
+            "id": 11,
+            "name": "C Button",
+            "key": "pad_trig_r"
+          },
+          {
+            "id": 21,
+            "name": "Sleep",
+            "key": "pad_btn_select"
+          }
+        ]
+      }
+    ]
+  }
 }
