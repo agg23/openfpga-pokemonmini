@@ -37,7 +37,7 @@ module rumble (
     output wire        cart_tran_bank3_dir
 );
 
-assign cart_tran_bank3 = {{6{1'bz}}, ad1_enable, 1'bz};
+assign cart_tran_bank3 = {{6{1'bz}}, ad_1_enable, 1'bz};
 assign cart_tran_bank2 = 8'hzz;
 assign cart_tran_bank1 = 8'hzz;
 assign cart_tran_bank0 = {1'bz, wr_enable_n, {2{1'bz}}};
@@ -52,7 +52,7 @@ reg ad_1_enable = 0;
 
 always @(posedge clk_74a) begin
     wr_enable_n <= ~active;
-    ad_1_enable <= active ? ~ad1_enable : 1'b0;
+    ad_1_enable <= ~ad_1_enable;
 end
 
 endmodule
