@@ -27,28 +27,27 @@ module rumble(
     input             active,
 
     output reg  [7:4] cart_tran_bank0,
-    input       [7:0] cart_tran_bank1,
-    input       [7:0] cart_tran_bank2,
+    output wire [7:0] cart_tran_bank1,
+    output wire [7:0] cart_tran_bank2,
     output reg  [7:0] cart_tran_bank3,
 
-    output reg        cart_tran_bank0_dir,
-    output reg        cart_tran_bank1_dir,
-    output reg        cart_tran_bank2_dir,
-    output reg        cart_tran_bank3_dir
+    output wire       cart_tran_bank0_dir,
+    output wire       cart_tran_bank1_dir,
+    output wire       cart_tran_bank2_dir,
+    output wire       cart_tran_bank3_dir
 );
 
-initial begin
-    cart_tran_bank3_dir = 1'b1;
-    cart_tran_bank2_dir = 1'b0;
-    cart_tran_bank1_dir = 1'b0;
-    cart_tran_bank0_dir = 1'b1;
-end
+assign cart_tran_bank2 = 8'hzz;
+assign cart_tran_bank1 = 8'hzz;
 
-reg pulse = 1;
+assign cart_tran_bank3_dir = 1'b1;
+assign cart_tran_bank2_dir = 1'b0;
+assign cart_tran_bank1_dir = 1'b0;
+assign cart_tran_bank0_dir = 1'b1;
+
 always @(posedge clk_74a) begin
     cart_tran_bank0[6] <= ~active;
-    cart_tran_bank3[1] <= pulse;
-    pulse              <= ~pulse;
+    cart_tran_bank3[1] <= active ? ~cart_tran_bank3[1] : 1'b0;
 end
 
 endmodule
