@@ -58,7 +58,10 @@ module pokemonmini (
     output wire [15:0] audio,
 
     // RTC
-    input wire [63:0] rtc_timestamp
+    input wire [63:0] rtc_timestamp,
+
+    // Rumble
+    output wire rumble_active
 );
   wire [127:0] status = 0;
 
@@ -478,7 +481,6 @@ module pokemonmini (
   wire eeprom_we = eeprom_we_rtc | bk_wr;
   wire [12:0] eeprom_address = eeprom_we_rtc ? eeprom_write_address_rtc : bk_addr;
   wire [7:0] eeprom_write_data = eeprom_we_rtc ? eeprom_write_data_rtc : bk_data;
-  wire minx_rumble;
   minx minx (
       .clk        (clk_sys_32),
       .clk_ce_4mhz(&minx_clk_prescale),
@@ -507,7 +509,7 @@ module pokemonmini (
 
       .sound_pulse (sound_pulse),
       .sound_volume(sound_volume),
-      .rumble      (minx_rumble),
+      .rumble      (rumble_active),
 
       .validate_rtc      (validate_rtc),
       .eeprom_internal_we(eeprom_internal_we),
