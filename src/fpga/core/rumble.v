@@ -22,32 +22,37 @@
 //
 ////////////////////////////////////////////////////////////////////////////////
 
-module rumble(
-    input             clk_74a,
-    input             active,
+module rumble (
+    input              clk_74a,
+    input              active,
 
-    output reg  [7:4] cart_tran_bank0,
-    output wire [7:0] cart_tran_bank1,
-    output wire [7:0] cart_tran_bank2,
-    output reg  [7:0] cart_tran_bank3,
+    output wire  [7:4] cart_tran_bank0,
+    output wire  [7:0] cart_tran_bank1,
+    output wire  [7:0] cart_tran_bank2,
+    output wire  [7:0] cart_tran_bank3,
 
-    output wire       cart_tran_bank0_dir,
-    output wire       cart_tran_bank1_dir,
-    output wire       cart_tran_bank2_dir,
-    output wire       cart_tran_bank3_dir
+    output wire        cart_tran_bank0_dir,
+    output wire        cart_tran_bank1_dir,
+    output wire        cart_tran_bank2_dir,
+    output wire        cart_tran_bank3_dir
 );
 
+assign cart_tran_bank3 = {{6{1'bz}}, ad1_enable, 1'bz};
 assign cart_tran_bank2 = 8'hzz;
 assign cart_tran_bank1 = 8'hzz;
+assign cart_tran_bank0 = {1'bz, wr_enable_n, {2{1'bz}}};
 
 assign cart_tran_bank3_dir = 1'b1;
 assign cart_tran_bank2_dir = 1'b0;
 assign cart_tran_bank1_dir = 1'b0;
 assign cart_tran_bank0_dir = 1'b1;
 
+reg wr_enable_n = 1;
+reg ad_1_enable = 0;
+
 always @(posedge clk_74a) begin
-    cart_tran_bank0[6] <= ~active;
-    cart_tran_bank3[1] <= active ? ~cart_tran_bank3[1] : 1'b0;
+    wr_enable_n <= ~active;
+    ad_1_enable <= active ? ~ad1_enable : 1'b0;
 end
 
 endmodule
