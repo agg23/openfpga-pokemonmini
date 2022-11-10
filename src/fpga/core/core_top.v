@@ -234,14 +234,14 @@ module core_top (
 
   // cart is unused, so set all level translators accordingly
   // directions are 0:IN, 1:OUT
-  assign cart_tran_bank3         = 8'hzz;
-  assign cart_tran_bank3_dir     = 1'b0;
-  assign cart_tran_bank2         = 8'hzz;
-  assign cart_tran_bank2_dir     = 1'b0;
-  assign cart_tran_bank1         = 8'hzz;
-  assign cart_tran_bank1_dir     = 1'b0;
-  assign cart_tran_bank0         = 4'hf;
-  assign cart_tran_bank0_dir     = 1'b1;
+  // assign cart_tran_bank3         = 8'hzz;
+  // assign cart_tran_bank3_dir     = 1'b0;
+  // assign cart_tran_bank2         = 8'hzz;
+  // assign cart_tran_bank2_dir     = 1'b0;
+  // assign cart_tran_bank1         = 8'hzz;
+  // assign cart_tran_bank1_dir     = 1'b0;
+  // assign cart_tran_bank0         = 4'hf;
+  // assign cart_tran_bank0_dir     = 1'b1;
   assign cart_tran_pin30         = 1'b0;  // reset or cs2, we let the hw control it by itself
   assign cart_tran_pin30_dir     = 1'bz;
   assign cart_pin30_pwroff_reset = 1'b0;  // hardware can control this
@@ -563,6 +563,31 @@ module core_top (
       clk_sys_32
   );
 
+  // Rumble
+
+  wire rumble_active;
+  wire rumble_active_s;
+
+  synch_3 rumble_s (
+    rumble_active, 
+    rumble_active_s, 
+    clk_sys_32
+  );
+
+  rumble rumble(
+      .clk_74a(clk_74a),
+      .active(rumble_active_s),
+
+      .cart_tran_bank0(cart_tran_bank0),
+      .cart_tran_bank1(cart_tran_bank1),
+      .cart_tran_bank2(cart_tran_bank2),
+      .cart_tran_bank3(cart_tran_bank3),
+      .cart_tran_bank0_dir(cart_tran_bank0_dir),
+      .cart_tran_bank1_dir(cart_tran_bank1_dir),
+      .cart_tran_bank2_dir(cart_tran_bank2_dir),
+      .cart_tran_bank3_dir(cart_tran_bank3_dir)
+  );
+
   // Settings
   reg blending_enabled;
 
@@ -636,7 +661,8 @@ module core_top (
       .video_b(vid_rgb_core[7:0]),
 
       .audio(audio),
-      .rtc_timestamp({rtc_date, rtc_time})
+      .rtc_timestamp({rtc_date, rtc_time}),
+      .rumble_active(rumble_active)
   );
 
 
