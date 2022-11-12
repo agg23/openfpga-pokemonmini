@@ -7,8 +7,8 @@
       "description": "A small handheld Tamagotchi-like console by Nintendo",
       "author": "agg23",
       "url": "https://github.com/agg23/openfpga-pokemonmini",
-      "version": "0.1.1",
-      "date_release": "2022-11-05"
+      "version": "0.2.0",
+      "date_release": "2022-11-12"
     },
     "framework": {
       "target_product": "Analogue Pocket",

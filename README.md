@@ -24,3 +24,7 @@ ROMs should be placed in `/Assets/poke_mini/common`.
 The Pokemon Mini LCD refreshes at up to 75Hz, but the Pocket and Dock is limited to ~60Hz. The core uses a four frame buffer to attempt to mitigate tearing effects, but it still will display some artifacts
 
 The `Frame Blend` option is provided to mimic the LCD persistence effect that some games take advantage of. Please note that this will further introduce video artifacts when motion occurs.
+
+### Rumble
+
+Rumble is supported using cartridges like the [DS Rumble Cart by insideGadgets](https://shop.insidegadgets.com/product/ds-cart-rumble-cart/).
